@@ -31,12 +31,16 @@ def scrape(url)
 
   rowdata = ->(tr, term) { 
     tds = tr.css('td')
+    area = tds[0].text.strip
+
     data = { 
       id: idify(tds[1].css('a')),
       name: tds[1].text.strip,
       wikipedia__en: tds[1].xpath('a[not(@class="new")]/@title').text.strip,
       party: tds[2].children.first.text.strip,
       party_id: '',
+      area: area,
+      area_id: "ocd-division/country:lc/constituency:%s" % area.downcase.tr(' ','-'),
       term: term,
       source: url,
     }
