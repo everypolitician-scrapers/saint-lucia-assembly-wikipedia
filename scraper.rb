@@ -34,10 +34,6 @@ class WikipediaPage < Scraped::HTML
 end
 
 class MemberRow < Scraped::HTML
-  field :id do
-    idify(tds[1].css('a'))
-  end
-
   field :name do
     tds[1].text.strip
   end
@@ -77,11 +73,6 @@ class MemberRow < Scraped::HTML
 
   def area
     tds[0].text.strip
-  end
-
-  def idify(a)
-    name = a.xpath('./@class').text == 'new' ? a.text : a.attr('title').value
-    name.tr(' ', '-').downcase
   end
 end
 
