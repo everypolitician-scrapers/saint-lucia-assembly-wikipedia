@@ -85,11 +85,16 @@ class MemberRow < Scraped::HTML
   end
 end
 
-url = 'https://en.wikipedia.org/wiki/House_of_Assembly_of_Saint_Lucia'
-page = WikipediaPage.new(response: Scraped::Request.new(url: url).response)
-current = page.current_composition.map { |m| m.to_h.merge(term: 9) }
-previous = page.previous_composition.map { |m| m.to_h.merge(term: 8) }
+cur_url = 'https://en.wikipedia.org/wiki/House_of_Assembly_of_Saint_Lucia'
+prv_url = 'https://en.wikipedia.org/w/index.php?title=House_of_Assembly_of_Saint_Lucia&oldid=705345669'
 
-# puts current + previous
-ScraperWiki.save_sqlite(%i(id term), current + previous)
+cur_page = WikipediaPage.new(response: Scraped::Request.new(url: cur_url).response)
+prv_page = WikipediaPage.new(response: Scraped::Request.new(url: prv_url).response)
+
+data = cur_page.current_composition.map  { |m| m.to_h.merge(term: 10) } +
+       cur_page.previous_composition.map { |m| m.to_h.merge(term: 9)  } +
+       prv_page.previous_composition.map { |m| m.to_h.merge(term: 8)  }
+
+# puts data
+ScraperWiki.save_sqlite(%i(id term), data)
 
