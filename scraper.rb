@@ -46,12 +46,15 @@ class MemberRow < Scraped::HTML
     tds[1].xpath('a[not(@class="new")]/@title').text.strip
   end
 
-  field :party do
+  field :party_id do
     tds[2].children.first.text.strip
   end
 
-  field :party_id do
-    party_id_for(party)
+  field :party do
+    return 'Saint Lucia Labour Party' if party_id == 'SLP'
+    return 'United Workers Party' if party_id == 'UWP'
+    return 'Independent' if party_id == 'Independent'
+    raise "unknown party; #{party_id}"
   end
 
   field :area do
@@ -74,13 +77,6 @@ class MemberRow < Scraped::HTML
 
   def area
     tds[0].text.strip
-  end
-
-  def party_id_for(party)
-    return 'Saint Lucia Labour Party' if party == 'SLP'
-    return 'United Workers Party' if party == 'UWP'
-    return 'Independent' if party == 'Independent'
-    raise "unknown party; #{party}"
   end
 
   def idify(a)
