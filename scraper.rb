@@ -54,7 +54,7 @@ class MemberRow < Scraped::HTML
   end
 
   field :area do
-    area
+    tds[0].text.strip
   end
 
   field :area_id do
@@ -69,10 +69,6 @@ class MemberRow < Scraped::HTML
 
   def tds
     noko.css('td')
-  end
-
-  def area
-    tds[0].text.strip
   end
 end
 
