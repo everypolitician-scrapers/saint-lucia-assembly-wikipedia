@@ -27,6 +27,8 @@ class WikidataIds < Scraped::Response::Decorator
 end
 
 class WikipediaPage < Scraped::HTML
+  decorator WikidataIds
+
   field :current_composition do
     current_composition_rows.map do |tr|
       fragment tr => MemberRow
@@ -51,6 +53,10 @@ class WikipediaPage < Scraped::HTML
 end
 
 class MemberRow < Scraped::HTML
+  field :id do
+    tds[1].css('a/@wikidata').text
+  end
+
   field :name do
     tds[1].text.strip
   end
@@ -102,4 +108,3 @@ data = cur_page.current_composition.map  { |m| m.to_h.merge(term: 10) } +
 # puts data
 ScraperWiki.sqliteexecute('DELETE FROM data') rescue nil
 ScraperWiki.save_sqlite(%i(name area term), data)
-
