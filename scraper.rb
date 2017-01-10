@@ -5,9 +5,26 @@
 require 'pry'
 require 'scraped'
 require 'scraperwiki'
+require 'wikidata/fetcher'
 
 require 'open-uri/cached'
 OpenURI::Cache.cache_path = '.cache'
+
+class WikidataIds < Scraped::Response::Decorator
+  def body
+    Nokogiri::HTML(super).tap do |doc|
+      links = doc.css('#bodyContent a[href*="/wiki"][title]').reject { |a| a[:title].include? ':' }
+      wdids = WikiData.ids_from_pages(language, links.map { |a| a[:title] }.uniq)
+      links.each { |a| a[:wikidata] = wdids[a[:title]] }
+    end.to_s
+  end
+
+  private
+
+  def language
+    URI.parse(url).hostname.split('.').first
+  end
+end
 
 class WikipediaPage < Scraped::HTML
   field :current_composition do
