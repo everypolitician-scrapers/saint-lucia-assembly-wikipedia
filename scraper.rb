@@ -83,6 +83,5 @@ data = cur_page.current_composition.map  { |m| m.to_h.merge(term: 10) } +
        prv_page.previous_composition.map { |m| m.to_h.merge(term: 8)  }
 
 # puts data
-ScraperWiki.sqliteexecute('DELETE FROM data') rescue nil
+ScraperWiki.sqliteexecute('DROP TABLE data') rescue nil
 ScraperWiki.save_sqlite(%i(name area term), data)
-
