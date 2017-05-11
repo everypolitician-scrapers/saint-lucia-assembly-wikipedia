@@ -21,3 +21,5 @@ gem 'scraperwiki', github: 'openaustralia/scraperwiki-ruby',
 gem 'table_unspanner', github: 'everypolitician/table_unspanner'
 gem 'vcr'
 gem 'webmock'
+gem 'wikidata-fetcher', '>= 0.19.1', github: 'everypolitician/wikidata-fetcher'
+gem 'wikisnakker', github: 'everypolitician/wikisnakker'

@@ -5,11 +5,30 @@
 require 'pry'
 require 'scraped'
 require 'scraperwiki'
+require 'wikidata/fetcher'
 
 require 'open-uri/cached'
 OpenURI::Cache.cache_path = '.cache'
 
+class WikidataIds < Scraped::Response::Decorator
+  def body
+    Nokogiri::HTML(super).tap do |doc|
+      links = doc.css('#bodyContent a[href*="/wiki"][title]').reject { |a| a[:title].include? ':' }
+      wdids = WikiData.ids_from_pages(language, links.map { |a| a[:title] }.uniq)
+      links.each { |a| a[:wikidata] = wdids[a[:title]] }
+    end.to_s
+  end
+
+  private
+
+  def language
+    URI.parse(url).hostname.split('.').first
+  end
+end
+
 class WikipediaPage < Scraped::HTML
+  decorator WikidataIds
+
   field :current_composition do
     current_composition_rows.map do |tr|
       fragment tr => MemberRow
@@ -34,6 +53,10 @@ class WikipediaPage < Scraped::HTML
 end
 
 class MemberRow < Scraped::HTML
+  field :id do
+    tds[1].css('a/@wikidata').text
+  end
+
   field :name do
     tds[1].text.strip
   end
